@@ -2,7 +2,7 @@
 #db
 #public
 
-
-db/*
+node_modules/
+db/
 .public/
 
