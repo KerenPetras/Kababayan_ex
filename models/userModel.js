@@ -25,3 +25,12 @@ role:Joi.string().min(2).max(400).allow(),
 })
 return joiSchema.validate(_reqBody)
 }
+
+
+exports.validLogin = (_reqBody) => {
+let joiSchema = Joi.object({
+password:Joi.string().min(2).max(400).required(),
+email:Joi.string().min(2).max(400).email().required(),
+})
+return joiSchema.validate(_reqBody)
+}

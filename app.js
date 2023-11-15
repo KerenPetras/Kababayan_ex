@@ -17,5 +17,5 @@ routesInit(app);
 
 
 const server = http.createServer(app);
-const port = process.env.PORT || 3005;
+const port = 3001;
 server.listen(port);
