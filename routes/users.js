@@ -1,6 +1,7 @@
 const express = require("express");
-const { UserModel, validateUser } = require("../models/userModel");
+const { UserModel, validateUser, validLogin } = require("../models/userModel");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 
 router.get("/", async(req,res) => {
   try{
@@ -32,8 +33,35 @@ router.post("/", async(req,res) => {
   }
   try {
     let user = new UserModel(req.body);
+    user.password = await bcrypt.hash(user.password, 10);
     await user.save();
+    // user.password = "*****";
     res.json(user)
+  }
+  catch(err) {
+    console.log(err);
+    res.status(502).json( {err})
+  }
+})
+
+router.post("/login", async(req,res) => {
+  let validBody = validLogin(req.body);
+  if(validBody.error) {
+    return res.status(400).json(validBody.error.details);
+  }
+  try {
+    let user = await UserModel.findOne({email: req.body.email});
+    
+    if(!user){
+      return res.json({msg:"Email or password not good"})
+    }
+
+    let userPass = await bcrypt.compare(req.body.password, user.password)
+
+    if(!userPass){
+      return res.json({msg:"Email or password not good"})
+    }
+    return res.json({msg:"you login"})
   }
   catch(err) {
     console.log(err);
