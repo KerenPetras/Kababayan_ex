@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const jwt = require("jsonwebtoken");
 
 let userSchema = new mongoose.Schema({
 userName :String,
@@ -10,7 +11,10 @@ phoneNumber:String,
 role : {
     type : String,
     default: "user"
-  }
+  },
+  date_created:{
+    type:Date , default:Date.now
+    }
 })
 exports.UserModel = mongoose.model("users",userSchema)
 
@@ -24,6 +28,12 @@ phoneNumber:Joi.string().min(2).max(400).required(),
 role:Joi.string().min(2).max(400).allow(),
 })
 return joiSchema.validate(_reqBody)
+}
+
+exports.getToken = (_userId) => { 
+  let token = jwt.sign({_id: _userId}, "dioKababayan", {expiresIn: "60mins"});
+return token;
+  
 }
 
 

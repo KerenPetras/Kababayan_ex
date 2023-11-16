@@ -1,7 +1,9 @@
 const express = require("express");
-const { UserModel, validateUser, validLogin } = require("../models/userModel");
+const { UserModel, validateUser, validLogin, getToken } = require("../models/userModel");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { auth } = require("../middlewares/auth");
 
 router.get("/", async(req,res) => {
   try{
@@ -61,13 +63,21 @@ router.post("/login", async(req,res) => {
     if(!userPass){
       return res.json({msg:"Email or password not good"})
     }
-    return res.json({msg:"you login"})
+    let token = getToken(user._id);
+
+    return res.json({token: token})
   }
   catch(err) {
     console.log(err);
     res.status(502).json( {err})
   }
 })
+
+router.get("/userInfo",auth, async(req,res) => {
+  let user = await UserModel.find({_id:req.tokenData._id},{password:0})
+  res.json(user);
+})
+
 
 router.put("/:id", async(req,res) => {
   let validBody = validateUser(req.body);
